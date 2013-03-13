@@ -1,0 +1,15 @@
+This is a replacement match scheduler for SR.
+
+Usage:
+ > Generate initial schedule:
+   sched-matches -matches [match-count] -teams [team-database]
+ > Recompute partial schedule:
+   sched-matches -matches [match-count] -teams [team-database] -recompute [past-matches]
+ > Change zone count:
+   sched-matches <foo> -zones [zone-count]
+ > Switch between empty slots and throwaways:
+   sched-matches <foo> [-empty|-throwaway]
+ > Set round constraint, and change length:
+   sched-matches -rounds [round-length]
+ > Set/clear zone balance constraint, and change length:
+   sched-matches [-balance-zones|-no-balance-zones]
