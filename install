@@ -1,0 +1,6 @@
+#!/bin/bash
+rm -rf dep
+virtualenv dep
+source dep/bin/activate
+easy_install docopt
+
