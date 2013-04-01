@@ -1,5 +1,12 @@
 from collections import namedtuple, defaultdict, deque
 from random import Random
+import constraint_maxteams
+import constraint_distribute
+import constraint_balance_zones
+import constraint_balance_matches
+import constraint_once_only
+import constraint_roundwise
+import constraint_compound
 
 ScheduleConfiguration = namedtuple('ScheduleConfiguration',
                                    ['zones', 'teams', 'weight_zones',
@@ -7,168 +14,6 @@ ScheduleConfiguration = namedtuple('ScheduleConfiguration',
                                     'match_count'])
 
 INFINITY = float('inf')
-
-def is_actual_entrant(team):
-    return team[0] != '-'
-
-class Constraint(object):
-    def __init__(self):
-        pass
-
-    def update(self, match):
-        pass
-
-    def evaluate(self, match):
-        return 0.0
-
-    def reset(self):
-        pass
-
-class CompoundConstraint(Constraint):
-    def __init__(self, sub_constraints):
-        self._sub_constraints = sub_constraints
-
-    def update(self, match):
-        for constraint in self._sub_constraints:
-            constraint.update(match)
-
-    def evaluate(self, match):
-        return sum(constraint.evaluate(match) for constraint
-                                             in self._sub_constraints)
-
-    def reset(self):
-        for constraint in self._sub_constraints:
-            constraint.reset()
-
-class WeightedConstraint(Constraint):
-    def __init__(self, sub, weight):
-        self._sub = sub
-        self._weight = weight
-
-    def update(self, match):
-        self._sub.update(match)
-
-    def evaluate(self, match):
-        return self.weight * self._sub.evaluate(match)
-
-    def reset(self):
-        self._sub.reset()
-
-class RoundwiseConstraint(Constraint):
-    def __init__(self, sub, length):
-        self._length = length
-        self._id = 0
-        self._sub = sub
-
-    def update(self, match):
-        self._id += 1
-        if self._id % self._length == 0:
-            self._sub.reset()
-        else:
-            self._sub.update(match)
-
-    def evaluate(self, match):
-        return self._sub.evaluate(match)
-
-    def reset(self):
-        self._id = 0
-        self._sub.reset()
-
-class OnceOnlyConstraint(Constraint):
-    def __init__(self, punishment = INFINITY):
-        self._teams = set()
-        self._punishment = punishment
-
-    def update(self, match):
-        for team in match:
-            if is_actual_entrant(team):
-                self._teams.add(team)
-
-    def _team_evaluate(self, team):
-        return self._punishment if team in self._teams else 0.0
-
-    def evaluate(self, match):
-        return sum(self._team_evaluate(team) for team in match)
-
-    def reset(self):
-        self._teams.clear()
-
-class BalanceMatchCountConstraint(Constraint):
-    def __init__(self):
-        self._team_match_counts = defaultdict(lambda: 0)
-        self._id = 0
-
-    def update(self, match):
-        for team in match:
-            if is_actual_entrant(team):
-                self._team_match_counts[team] += 1
-        self._id += 1
-
-    def evaluate(self, match):
-        return 10.0 * sum(self._team_match_counts[team] for team in match) / float(self._id + 1)
-
-    def reset(self):
-        self._id = 0
-        self._team_match_counts.clear()
-
-class BalanceZoneCountConstraint(Constraint):
-    def __init__(self):
-        self._team_zone_counts = defaultdict(lambda: 0)
-        self._id = 0
-
-    def update(self, match):
-        for zone, team in enumerate(match):
-            if is_actual_entrant(team):
-                self._team_zone_counts[team, zone] += 1
-        self._id += 1
-
-    def evaluate(self, match):
-        return (sum(self._team_zone_counts[team, zone] for zone, team in enumerate(match))
-                / float(self._id + 1))
-
-    def reset(self):
-        self._id = 0
-        self._team_zone_counts.clear()
-
-class DistributeMatchesConstraint(Constraint):
-    def __init__(self, minimum_separation = 3, target_separation = 5):
-        self._minimum_separation = minimum_separation
-        self._target_separation = target_separation
-        self._last_matches = {}
-        self._id = 0
-
-    def update(self, match):
-        for team in match:
-            if is_actual_entrant(team):
-                self._last_matches[team] = self._id
-        self._id += 1
-
-    def _evaluate_team(self, team):
-        if team not in self._last_matches:
-            return 0.0
-        distance_from_last = self._id - self._last_matches[team] - 1
-        if distance_from_last < self._minimum_separation:
-            return INFINITY
-        return 7.0 * (self._target_separation - distance_from_last)
-
-    def evaluate(self, match):
-        return sum(self._evaluate_team(team) for team in match)
-
-    def reset(self):
-        self._id = 0
-        self._last_matches.clear()
-
-class MaximiseTeamsConstraint(Constraint):
-    def __init__(self, max_blanks, punishment = 12.0):
-        self._punishment = punishment
-        self._max_blanks = max_blanks
-
-    def evaluate(self, match):
-        number_blank = len([x for x in match if not is_actual_entrant(x)])
-        if number_blank > self._max_blanks:
-            # this is not a viable match at all
-            return INFINITY
-        return (self._punishment * 2**number_blank) - self._punishment
 
 class Scheduler(object):
     def __init__(self, configuration):
@@ -183,14 +28,14 @@ class Scheduler(object):
     def _init_constraint(self):
         subconstraints = []
         if self.configuration.round_length is not None:
-            subconstraints.append(RoundwiseConstraint(sub = OnceOnlyConstraint(),
+            subconstraints.append(constraint_roundwise.RoundwiseConstraint(sub = constraint_once_only.OnceOnlyConstraint(),
                                                       length = self.configuration.round_length))
-        subconstraints.append(BalanceMatchCountConstraint())
-        subconstraints.append(MaximiseTeamsConstraint(2))
-        subconstraints.append(DistributeMatchesConstraint(1, 2))
+        subconstraints.append(constraint_balance_matches.BalanceMatchCountConstraint())
+        subconstraints.append(constraint_maxteams.MaximiseTeamsConstraint(2))
+        subconstraints.append(constraint_distribute.DistributeMatchesConstraint(1, 2))
         if self.configuration.weight_zones:
-            subconstraints.append(BalanceZoneCountConstraint())
-        self._constraint = CompoundConstraint(subconstraints)
+            subconstraints.append(constraint_balance_zones.BalanceZoneCountConstraint())
+        self._constraint = constraint_compound.CompoundConstraint(subconstraints)
 
     def add_match(self, match):
         self.matches.append(match)
