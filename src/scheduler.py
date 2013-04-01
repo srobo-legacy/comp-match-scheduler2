@@ -8,21 +8,12 @@ import constraint_once_only
 import constraint_roundwise
 import constraint_compound
 import sched
+import sched_utils
 
 ScheduleConfiguration = namedtuple('ScheduleConfiguration',
                                    ['zones', 'teams', 'weight_zones',
                                     'round_length', 'imbalance_action',
                                     'match_count'])
-
-def full_schedule(configuration):
-    scheduler = sched.Scheduler(configuration)
-    scheduler.compute_full_schedule()
-    return scheduler.matches
-
-def partial_schedule(configuration, past_matches):
-    scheduler = sched.Scheduler(configuration)
-    scheduler.compute_partial_schedule(past_matches)
-    return scheduler.matches
 
 def match_statistics(matches):
     from collections import Counter, defaultdict
@@ -56,7 +47,7 @@ if __name__ == '__main__':
                                    round_length = None,
                                    imbalance_action = 'empty',
                                    match_count = 25)
-    schedule = full_schedule(config)
+    schedule = sched_utils.full_schedule(config)
     schedule_check(schedule)
     import json
     print json.dumps(schedule)
