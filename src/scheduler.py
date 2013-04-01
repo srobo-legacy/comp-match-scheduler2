@@ -9,31 +9,16 @@ import constraint_roundwise
 import constraint_compound
 import sched
 import sched_utils
+import match_stats
 
 ScheduleConfiguration = namedtuple('ScheduleConfiguration',
                                    ['zones', 'teams', 'weight_zones',
                                     'round_length', 'imbalance_action',
                                     'match_count'])
 
-def match_statistics(matches):
-    from collections import Counter, defaultdict
-    match_counter = Counter()
-    opponents = defaultdict(set)
-    prev_match = []
-    collisions = set()
-    for match in matches:
-        for team in match:
-            if team in prev_match:
-                collisions.add(team)
-            match_counter[team] += 1
-            for other_team in match:
-                if team != other_team:
-                    opponents[team].add(other_team)
-    return match_counter, opponents, collisions
-
 def schedule_check(matches):
     print '{0} matches total'.format(len(matches))
-    match_counter, opponents, collisions = match_statistics(matches)
+    match_counter, opponents, collisions = match_stats.match_statistics(matches)
     all_teams = set(match_counter.iterkeys())
     for team, matches in match_counter.iteritems():
         print '{0}: {1} matches, missed opponents: {2}'.format(team, matches, ', '.join(all_teams - opponents[team] - {team}))
