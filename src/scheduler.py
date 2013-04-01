@@ -13,8 +13,6 @@ ScheduleConfiguration = namedtuple('ScheduleConfiguration',
                                     'round_length', 'imbalance_action',
                                     'match_count'])
 
-INFINITY = float('inf')
-
 class Scheduler(object):
     def __init__(self, configuration):
         self.configuration = configuration
@@ -53,7 +51,7 @@ class Scheduler(object):
         return min(pool, key = self._constraint.evaluate)
 
     def _is_viable(self, match):
-        return self._constraint.evaluate(match) < INFINITY
+        return self._constraint.evaluate(match) < float('inf')
 
     def _imbalance_surrogate(self, match):
         assert self.configuration.imbalance_action != 'empty'
