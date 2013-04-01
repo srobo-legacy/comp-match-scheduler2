@@ -1,15 +1,5 @@
-from collections import namedtuple, defaultdict, deque
-from random import Random
-import constraint_maxteams
-import constraint_distribute
-import constraint_balance_zones
-import constraint_balance_matches
-import constraint_once_only
-import constraint_roundwise
-import constraint_compound
-import sched
+from collections import namedtuple
 import sched_utils
-import match_stats
 import check
 
 ScheduleConfiguration = namedtuple('ScheduleConfiguration',
