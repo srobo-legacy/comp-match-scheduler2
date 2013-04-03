@@ -1,4 +1,5 @@
 import constraint
+
 class RoundwiseConstraint(constraint.Constraint):
     def __init__(self, sub, length):
         self._length = length
@@ -18,3 +19,6 @@ class RoundwiseConstraint(constraint.Constraint):
     def reset(self):
         self._id = 0
         self._sub.reset()
+
+    def suggest_matches(self, teams):
+        return self._sub.suggest_matches(teams)

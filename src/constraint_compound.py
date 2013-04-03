@@ -14,3 +14,8 @@ class CompoundConstraint(constraint.Constraint):
     def reset(self):
         for constraint in self._sub_constraints:
             constraint.reset()
+
+    def suggest_matches(self, teams):
+        for subconstraint in self._sub_constraints:
+            for suggestion in subconstraint.suggest_matches(teams):
+                yield suggestion

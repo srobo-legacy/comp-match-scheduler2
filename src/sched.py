@@ -41,7 +41,9 @@ class Scheduler(object):
                                self.configuration.zones)
 
     def _random_match_pool(self, pool_size = 1400):
-        return [self._random_match() for i in xrange(pool_size)]
+        base = [self._random_match() for i in xrange(pool_size)]
+        base.append(self._constraint.suggest_matches(self.configuration.teams))
+        return base
 
     def _best_match_from_pool(self, pool):
         return min(pool, key = self._constraint.evaluate)

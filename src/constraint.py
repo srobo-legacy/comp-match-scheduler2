@@ -10,3 +10,7 @@ class Constraint(object):
 
     def reset(self):
         pass
+
+    def suggest_matches(self, teams):
+        return ()
+
