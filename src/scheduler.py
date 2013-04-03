@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Match scheduler.
 
 Usage:
@@ -32,6 +33,7 @@ if __name__ == '__main__':
     if options['--empty']:
         imba = 'empty'
     with open(options['<teams>'], 'r') as f:
+        print options["<teams>"]
         teams = [x.strip() for x in f if x.strip()]
     if options['partial']:
         with open(options['<previous>'], 'r') as f:
