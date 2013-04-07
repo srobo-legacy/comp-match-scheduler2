@@ -16,6 +16,8 @@ class DistributeMatchesConstraint(constraint.Constraint):
         self._id += 1
 
     def _evaluate_team(self, team):
+        if not is_actual_entrant(team):
+            return 0.0
         if team not in self._last_matches:
             return 0.0
         distance_from_last = self._id - self._last_matches[team] - 1
