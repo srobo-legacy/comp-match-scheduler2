@@ -6,7 +6,7 @@ matchcount=1
 # Actually say 102 matches, because this script always produces one more...
 for line in `./run full ${cwd}/teams-2013 102`; do
   # Fixme
-  cd /srv/compd/command
+  cd /srv/compd/
 
   teamlist=`echo $line | tr '|' ' '`
 
@@ -18,7 +18,7 @@ for line in `./run full ${cwd}/teams-2013 102`; do
   echo $matchtime
 
   # Hard coded because bah.
-  #/srv/compd/command add-match $name $time
+  /srv/compd/command add-match $name $matchtime
 
   matchcount=`expr $matchcount + 1`
 done
