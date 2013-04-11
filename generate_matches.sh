@@ -20,6 +20,7 @@ for line in `./run full ${cwd}/teams-2013 102`; do
 
   # Hard coded because bah.
   ./command add-match $name $matchtime
+  ./command set-match-teams $name $teamlist
 
   matchcount=`expr $matchcount + 1`
 done
