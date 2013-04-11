@@ -15,12 +15,12 @@ if matchno <= 50:
     # On the first day
     start = datetime.datetime(2013, 4, 13, 13, 20)
     match_time = start + (match_length * (matchno - 1))
-elif matchno <= 76:
+elif matchno <= 82:
     # On second day, first half,
     start = datetime.datetime(2013, 4, 14, 9, 35)
     match_time = start + (match_length * (matchno - 51))
 else:
     start = datetime.datetime(2013, 4, 14, 13, 15)
-    match_time = start + (match_length * (matchno - 77))
+    match_time = start + (match_length * (matchno - 83))
 
 print match_time.isoformat()
