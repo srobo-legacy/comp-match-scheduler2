@@ -5,7 +5,7 @@ cwd=`pwd`
 compd_dir=/srv/compd
 matchcount=1
 # Actually say 102 matches, because this script always produces one more...
-for line in `./run full ${cwd}/teams-2013 102`; do
+for line in `./run full ${cwd}/teams-2013 102 --weight`; do
   # Fixme
   cd $compd_dir
 
