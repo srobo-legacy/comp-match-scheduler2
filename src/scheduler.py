@@ -17,6 +17,7 @@ Options:
 from collections import namedtuple
 import sched_utils
 import check
+import sys
 from docopt import docopt
 
 ScheduleConfiguration = namedtuple('ScheduleConfiguration',
@@ -33,7 +34,7 @@ if __name__ == '__main__':
     if options['--empty']:
         imba = 'empty'
     with open(options['<teams>'], 'r') as f:
-        print options["<teams>"]
+        print >> sys.stderr, 'Using:', options["<teams>"]
         teams = [x.strip() for x in f if x.strip()]
     if options['partial']:
         with open(options['<previous>'], 'r') as f:
