@@ -5,7 +5,7 @@ cwd=`pwd`
 compd_dir=/srv/compd
 matchcount=1
 # Actually say 102 matches, because this script always produces one more...
-for line in `cat out`; do
+for line in `cat data/2013/schedule`; do
   # Fixme
   cd $compd_dir
 
