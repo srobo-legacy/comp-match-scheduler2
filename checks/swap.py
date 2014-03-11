@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 import sys
 
 if len(sys.argv) != 2 or '--help' in sys.argv:

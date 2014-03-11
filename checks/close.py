@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 from collections import defaultdict, Counter
 import sys
 
